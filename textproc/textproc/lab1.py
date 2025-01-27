@@ -26,8 +26,9 @@ class WordOccurrences:
         """
         
         self.wordOccurrenceDict:typing.Dict[str, int] = self._getUniqueWordOccurrences(pathToTxtFile)
+        self.largestOccurrenceIndex:int = self.wordOccurrenceDict.pop("MAX", -1)
+        assert self.largestOccurrenceIndex != -1, "ERR: No words found"
         self.occurrenceWordDict:typing.Dict[int, str] = self._swapStrIntDictKeyValue(self.wordOccurrenceDict)
-        self.largestOccurrenceIndex:int = len(self.occurrenceWordDict) - 1
     
     def _getUniqueWordOccurrences(self, pathToTxtFile: os.PathLike) -> typing.Dict[str, int]:
         """
@@ -45,6 +46,7 @@ class WordOccurrences:
         assert os.path.exists(pathToTxtFile), f"ERR: Could not find file at: {pathToTxtFile}"
         
         wordOccurrenceDict:typing.Dict[str, int] = collections.defaultdict(int)
+        mostOccurringWordOccurrences:int = 0
         with open(pathToTxtFile, 'r') as txtFile:
             
             fileContent = txtFile.read()
@@ -56,7 +58,9 @@ class WordOccurrences:
                 
                 # if word in wordOccurrenceDict:
                 wordOccurrenceDict[word] += 1
+                mostOccurringWordOccurrences = wordOccurrenceDict[word] if wordOccurrenceDict[word] > mostOccurringWordOccurrences else mostOccurringWordOccurrences
                 
+        wordOccurrenceDict["MAX"] = mostOccurringWordOccurrences
         
         return wordOccurrenceDict
     
@@ -170,6 +174,7 @@ if __name__ == "__main__":
     textfilePath = os.path.join(__file__, "..\\..\\tests\\sample_data\\Sample1.txt")
     wordOccurrences = WordOccurrences(textfilePath)
     
+    wordOccurrences.printTopKOccurrences(5, wordOccurrences.Options.INCLUDE_NO_OCCURRENCES)
     wordOccurrences.printTopKOccurrences(5, wordOccurrences.Options.SKIP_NO_OCCURRENCES)
     
     print(f"Largest: {wordOccurrences.occurrenceWordDict[wordOccurrences.largestOccurrenceIndex]}")
