@@ -171,10 +171,12 @@ class WordOccurrences:
 
 # For development testing purposes
 if __name__ == "__main__":
+    import sys
+    
     textfilePath = os.path.join(__file__, "..\\..\\tests\\sample_data\\Sample1.txt")
     wordOccurrences = WordOccurrences(textfilePath)
     
-    wordOccurrences.printTopKOccurrences(5, wordOccurrences.Options.INCLUDE_NO_OCCURRENCES)
-    wordOccurrences.printTopKOccurrences(5, wordOccurrences.Options.SKIP_NO_OCCURRENCES)
+    wordOccurrences.printTopKOccurrences(int(sys.argv[1]) if int(sys.argv[1]) > 0 else 5, wordOccurrences.Options.INCLUDE_NO_OCCURRENCES)
+    wordOccurrences.printTopKOccurrences(int(sys.argv[1]) if int(sys.argv[1]) > 0 else 5, wordOccurrences.Options.SKIP_NO_OCCURRENCES)
     
     print(f"Largest: {wordOccurrences.occurrenceWordDict[wordOccurrences.largestOccurrenceIndex]}")
