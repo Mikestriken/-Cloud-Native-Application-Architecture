@@ -175,6 +175,9 @@ if __name__ == "__main__":
     wordOccurrences = WordOccurrences(textfilePath)
     
     wordOccurrences.printTopKOccurrences(5, wordOccurrences.Options.INCLUDE_NO_OCCURRENCES)
+<<<<<<< HEAD
     wordOccurrences.printTopKOccurrences(5, wordOccurrences.Options.SKIP_NO_OCCURRENCES)
+=======
+>>>>>>> f64ab8002fd723bbcd6a5840832bf7e93b639e21
     
     print(f"Largest: {wordOccurrences.occurrenceWordDict[wordOccurrences.largestOccurrenceIndex]}")
