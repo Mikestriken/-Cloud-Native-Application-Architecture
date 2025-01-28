@@ -158,7 +158,7 @@ class WordOccurrences:
             
             numberOfOccurrencesIterator -= 1
             
-            if numberOfOccurrencesFound == k: retrievedAllKOccurrences = True
+            if numberOfOccurrencesFound == k or numberOfOccurrencesIterator < 1: retrievedAllKOccurrences = True
                 
             if (not retrievedAllKOccurrences and occurrenceFound):
                 topKOccurrence +=                                                                               f"----------------------------------------------------------------------\n"
@@ -173,8 +173,10 @@ class WordOccurrences:
 if __name__ == "__main__":
     import sys
     
-    textfilePath = os.path.join(__file__, "..\\..\\tests\\sample_data\\Sample1.txt")
+    textfilePath = os.path.join(__file__, "..\\..\\tests\\sample_data\\Sample2.txt")
     wordOccurrences = WordOccurrences(textfilePath)
+    
+    # sys.argv = [sys.argv[0], 5]
     
     wordOccurrences.printTopKOccurrences(int(sys.argv[1]) if int(sys.argv[1]) > 0 else 5, wordOccurrences.Options.INCLUDE_NO_OCCURRENCES)
     wordOccurrences.printTopKOccurrences(int(sys.argv[1]) if int(sys.argv[1]) > 0 else 5, wordOccurrences.Options.SKIP_NO_OCCURRENCES)
