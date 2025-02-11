@@ -1,3 +1,6 @@
+# Invoke-RestMethod -Uri "http://127.0.0.1:8000/users/1234"
+# Invoke-RestMethod -Uri "http://127.0.0.1:8000/user/" -Method Post -Headers @{"Content-Type"="application/json"} -Body '{"ID": 123,"email": "mm@", "username": "mm"}'
+
 from typing import Dict, Any, Union
 from fastapi import FastAPI, HTTPException
 
@@ -33,7 +36,7 @@ def create_item(item: Dict[str, Any]) -> Dict[str, Any]:
     itemDB[item["ID"]] = item
     
     return {"result": "Item created", "item": item}
-
+# ==========================================================================================================
 @app.get("/users/{user_id}")
 def read_user(user_id: int):
     if user_id in userDB:
