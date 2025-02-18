@@ -16,3 +16,6 @@
 # Archives
 *.zip
 *.Zip
+
+# API Keys
+**/api_key*
