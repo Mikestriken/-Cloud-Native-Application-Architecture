@@ -1,0 +1,21 @@
+[project]
+name = "orm-lab"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mikestriken",email = "michael.john.marais379@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "sqlalchemy (>=2.0.39,<3.0.0)",
+    "psycopg2 (>=2.9.10,<3.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "orm_lab", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
