@@ -28,7 +28,6 @@ async def compute_resume_job_match(resume_text, job_description):
     Use Gemini to compute the match between a resume and job description
     Returns a relevance score between 0.0 and 1.0
     """
-    logger.info("Computing match between resume and job description")
     logger.debug(f"Resume length: {len(resume_text)} characters")
     logger.debug(f"Job description length: {len(job_description)} characters")
     
@@ -55,7 +54,6 @@ async def compute_resume_job_match(resume_text, job_description):
     """
     
     try:
-        logger.info("Calling Gemini API")
         # Using asyncio to run synchronous Gemini API call in async context
         response = await asyncio.to_thread(
             model.generate_content,
@@ -63,14 +61,14 @@ async def compute_resume_job_match(resume_text, job_description):
         )
         
         score_text = response.text.strip()
-        logger.info(f"Received response from Gemini API: '{score_text}'")
+        # logger.info(f"Received response from Gemini API: '{score_text}'")
         
         # Extract numeric value from response
         try:
             score = float(score_text)
             # Ensure score is within valid range
             final_score = max(0.0, min(score, 1.0))
-            logger.info(f"Parsed match score: {final_score}")
+            # logger.info(f"Parsed match score: {final_score}")
             return final_score
         except ValueError:
             # Fallback if we can't parse the score

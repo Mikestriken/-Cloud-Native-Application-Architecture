@@ -173,7 +173,8 @@ def render_sidebar():
     st.sidebar.title("Resume Job Matcher")
     
     if st.session_state.logged_in:
-        st.sidebar.button("Logout", on_click=logout)
+        if st.sidebar.button("Logout"):
+            logout()
     else:
         st.sidebar.info("Please login or register to continue")
 
@@ -242,7 +243,6 @@ def render_main_app():
                     with st.spinner("Processing resume and finding matches..."):
                         matches = upload_resume(resume_text)
                         
-                        logger.info(f"Matches:\n{matches}\n=========================================")
                         if matches:
                             st.session_state.upload_success = True
                             st.session_state.job_matches = matches
@@ -254,7 +254,6 @@ def render_main_app():
                     with st.spinner("Processing resume and finding matches..."):
                         matches = upload_resume(resume_text)
                         
-                        logger.info(f"Matches:\n{matches}\n=========================================")
                         if matches:
                             st.session_state.upload_success = True
                             st.session_state.job_matches = matches
@@ -264,13 +263,6 @@ def render_main_app():
     
     with matches_tab:
         st.header("Your Job Matches")
-        
-        if st.session_state.resume_id:
-            if st.button("Refresh Matches"):
-                with st.spinner("Fetching latest matches..."):
-                    matches = get_job_matches(st.session_state.resume_id)
-                    if matches:
-                        st.success("Matches refreshed!")
         
         if st.session_state.job_matches:
             # Convert matches to DataFrame for easy display
@@ -325,6 +317,12 @@ def render_main_app():
                                 st.markdown(job_details['description'])
             else:
                 st.info("No job matches found. Try uploading a different resume.")
+                if st.session_state.resume_id:
+                    if st.button("Refresh Latest Matches"):
+                        with st.spinner("Fetching latest matches..."):
+                            matches = get_job_matches(st.session_state.resume_id)
+                            if matches:
+                                st.success("Matches refreshed!")
         else:
             st.info("Upload your resume to see job matches.")
 

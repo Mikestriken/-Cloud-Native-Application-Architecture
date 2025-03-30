@@ -9,6 +9,14 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 from app.models import User, Resume, Job, Match
 from app.db import get_db
@@ -116,16 +124,32 @@ async def create_user(user: UserCreate, db: Session = Depends(get_db)):
 # Resume Endpoints
 @app.post("/upload_resume")
 async def upload_resume(resume: ResumeCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # Store the resume in the database
-    db_resume = Resume(
-        user_id=current_user.id,
-        content=resume.content
-    )
-    db.add(db_resume)
-    db.commit()
-    db.refresh(db_resume)
+    # Check if the user already has a resume
+    existing_resume = db.query(Resume).filter(Resume.user_id == current_user.id).first()
     
-    # Match with jobs and store matches - now passing the resume_id
+    if existing_resume:
+        # Update existing resume
+        existing_resume.content = resume.content
+        db_resume = existing_resume
+        db.commit()
+        db.refresh(db_resume)
+        
+        # Log the update
+        logger.info(f"Updated existing resume for user ID {current_user.id}, resume ID {db_resume.id}")
+    else:
+        # Create new resume
+        db_resume = Resume(
+            user_id=current_user.id,
+            content=resume.content
+        )
+        db.add(db_resume)
+        db.commit()
+        db.refresh(db_resume)
+        
+        # Log the creation
+        logger.info(f"Created new resume for user ID {current_user.id}, resume ID {db_resume.id}")
+    
+    # Match with jobs and store matches
     matches = await match_resume_with_jobs(db_resume.content, db_resume.id, db)
     return {"resume_id": db_resume.id, "matches": matches}
 
