@@ -47,8 +47,8 @@ if "selected_job" not in st.session_state:
     st.session_state.selected_job = None
 if "job_matches" not in st.session_state:
     st.session_state.job_matches = []
-if "active_tab" not in st.session_state:
-    st.session_state.active_tab = "Upload Resume"  # Default tab
+if "upload_success" not in st.session_state:
+    st.session_state.upload_success = False
 
 # Helper functions
 def extract_text_from_pdf(pdf_file):
@@ -217,6 +217,10 @@ def render_main_app():
     """Render the main application after login"""
     st.title("Resume Job Matcher")
     
+    if st.session_state.get('upload_success'):
+        st.success("Resume uploaded successfully! View matches in the Job Matches tab.")
+        st.session_state.upload_success = False
+    
     upload_tab, matches_tab = st.tabs(["Upload Resume", "Job Matches"])
     
     with upload_tab:
@@ -240,9 +244,8 @@ def render_main_app():
                         
                         logger.info(f"Matches:\n{matches}\n=========================================")
                         if matches:
-                            st.success("Resume uploaded successfully! View matches in the Job Matches tab.")
+                            st.session_state.upload_success = True
                             st.session_state.job_matches = matches
-                            st.session_state.active_tab = "Job Matches"
                             st.rerun()
         else:
             resume_text = st.text_area("Paste your resume text here:", height=300)
@@ -253,9 +256,8 @@ def render_main_app():
                         
                         logger.info(f"Matches:\n{matches}\n=========================================")
                         if matches:
-                            st.success("Resume uploaded successfully! View matches in the Job Matches tab.")
+                            st.session_state.upload_success = True
                             st.session_state.job_matches = matches
-                            st.session_state.active_tab = "Job Matches"
                             st.rerun()
                 else:
                     st.warning("Please enter your resume text.")
