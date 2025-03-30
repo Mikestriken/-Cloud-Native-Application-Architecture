@@ -49,6 +49,8 @@ if "job_matches" not in st.session_state:
     st.session_state.job_matches = []
 if "upload_success" not in st.session_state:
     st.session_state.upload_success = False
+if "expanded_jobs" not in st.session_state:
+    st.session_state.expanded_jobs = set()
 
 # Helper functions
 def extract_text_from_pdf(pdf_file):
@@ -296,18 +298,26 @@ def render_main_app():
                 
                 # Clickable table
                 for i, row in df.iterrows():
+                    job_id = row["Job ID"]
+                    
                     col1, col2, col3 = st.columns([3, 1, 1])
                     with col1:
-                        if st.button(f"{row['Job Title']} - {row['Company']}", key=f"job_{row['Job ID']}_{i}"):
-                            st.session_state.selected_job = row["Job ID"]
+                        # When a job title is clicked, toggle its expanded state
+                        if st.button(f"{row['Job Title']} - {row['Company']}", key=f"job_{job_id}_{i}"):
+                            # If job is already expanded, remove it, otherwise add it
+                            if job_id in st.session_state.expanded_jobs:
+                                st.session_state.expanded_jobs.remove(job_id)
+                            else:
+                                st.session_state.expanded_jobs.add(job_id)
+                    
                     with col2:
                         st.write(row["Location"])
                     with col3:
                         st.write(row["Match Score"])
                     
-                    # Show job details if selected
-                    if st.session_state.selected_job == row["Job ID"]:
-                        job_details = get_job_details(row["Job ID"])
+                    # Show job details if this job is in the expanded set
+                    if job_id in st.session_state.expanded_jobs:
+                        job_details = get_job_details(job_id)
                         if job_details:
                             with st.expander("Job Details", expanded=True):
                                 st.markdown(f"## {job_details['title']}")

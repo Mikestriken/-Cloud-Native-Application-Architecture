@@ -3,9 +3,14 @@ Database connection and session management
 """
 # Query DB Command: `docker-compose exec db psql -U postgres -d resumejobmatcher`
 import os
+import logging
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Get database URL from environment or use default for local development
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@db:5432/resumejobmatcher")
@@ -27,18 +32,36 @@ def get_db():
 def init_db():
     """Initialize database tables"""
     from app.models import Base
+    logger.info("Creating database tables...")
     Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
 
 def seed_initial_data():
     """Seed initial job data for demonstration purposes"""
-    from app.models import Job
+    from app.models import Job, Match
+    from sqlalchemy import text
     from sqlalchemy.orm import Session
     
     db = SessionLocal()
     
-    # Check if jobs table is empty
-    job_count = db.query(Job).count()
-    if job_count == 0:
+    try:
+        # First, delete all matches to avoid foreign key constraints
+        match_count = db.query(Match).count()
+        if match_count > 0:
+            logger.info(f"Deleting {match_count} existing matches...")
+            db.query(Match).delete()
+            db.commit()
+            logger.info("All existing matches deleted successfully")
+        
+        # Then delete all existing jobs
+        job_count = db.query(Job).count()
+        if job_count > 0:
+            logger.info(f"Deleting {job_count} existing jobs...")
+            db.query(Job).delete()
+            db.commit()
+            logger.info("All existing jobs deleted successfully")
+        
+        logger.info("Seeding initial job data...")
         # Add some sample job listings
         sample_jobs = [
             Job(
@@ -347,5 +370,13 @@ def seed_initial_data():
             db.add(job)
         
         db.commit()
-    
-    db.close() 
+        logger.info(f"Added {len(sample_jobs)} sample jobs to the database")
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Error seeding job data: {str(e)}")
+    finally:
+        db.close()
+        
+if __name__ == "__main__":
+    init_db()
+    seed_initial_data()
